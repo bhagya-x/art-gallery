@@ -1,0 +1,3 @@
+-- සිංහල සටහන: OTP login feature එක session-based නිසා database table changes අවශ්‍ය නැහැ.
+-- මෙම file එක documentation purpose එකට පමණයි.
+-- PHPMailer SMTP details config/mail.php file එකේ set කරන්න.
