@@ -10,15 +10,18 @@ if (file_exists($autoloadPath)) {
 
 function write_mail_log(string $to, string $subject, string $body, string $status = 'LOGGED'): void
 {
-    // සිංහල සටහන: local testing සඳහා email details log file එකකට save කරයි.
+    // local testing fallback log
     $logDir = __DIR__ . '/../storage/logs/';
     if (!is_dir($logDir)) {
-        mkdir($logDir, 0775, true);
+        @mkdir($logDir, 0775, true);
+    }
+    if (!is_writable($logDir)) {
+        $logDir = sys_get_temp_dir() . '/';
     }
 
     $plainBody = trim(strip_tags(str_replace(['<br>', '<br/>', '<br />'], "\n", $body)));
     $line = "[" . date('Y-m-d H:i:s') . "] {$status}\nTO: {$to}\nSUBJECT: {$subject}\n{$plainBody}\n\n";
-    file_put_contents($logDir . 'email.log', $line, FILE_APPEND);
+    @file_put_contents($logDir . 'email.log', $line, FILE_APPEND);
 }
 
 function send_app_mail(string $to, string $subject, string $htmlBody, ?string $plainBody = null): bool

@@ -1,0 +1,5 @@
+/vendor
+.env
+.vercel
+/storage/logs/*.log
+desktop.ini

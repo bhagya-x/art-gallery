@@ -10,6 +10,15 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 $path = $_GET['path'] ?? 'index.php';
 $path = ltrim($path, '/');
 
+// Normalize routes
+if ($path === '' || $path === 'index') {
+    $path = 'index.php';
+} elseif ($path === 'admin' || $path === 'admin/') {
+    $path = 'admin/dashboard.php';
+} elseif (!str_ends_with($path, '.php')) {
+    $path .= '.php';
+}
+
 $allowedPages = [
     'index.php',
     'about.php',
@@ -43,7 +52,8 @@ $allowedPages = [
 
 if (!in_array($path, $allowedPages, true)) {
     http_response_code(404);
-    exit('Page not found');
+    echo '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body style="font-family:sans-serif;text-align:center;padding:50px;"><h1>404 - Page Not Found</h1><p><a href="/">Return to Home</a></p></body></html>';
+    exit;
 }
 
 $file = $root . DIRECTORY_SEPARATOR
@@ -51,7 +61,12 @@ $file = $root . DIRECTORY_SEPARATOR
 
 if (!is_file($file)) {
     http_response_code(404);
-    exit('Page not found');
+    echo '<!DOCTYPE html><html><head><title>404 Not Found</title></head><body style="font-family:sans-serif;text-align:center;padding:50px;"><h1>404 - File Not Found</h1><p><a href="/">Return to Home</a></p></body></html>';
+    exit;
 }
+
+// Preserve active page highlight for navbars
+$_SERVER['SCRIPT_NAME'] = '/' . $path;
+$_SERVER['PHP_SELF'] = '/' . $path;
 
 require $file;
