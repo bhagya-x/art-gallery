@@ -5,7 +5,7 @@ define('APP_TAGLINE', 'Premium Online Art Gallery');
 
 // සිංහල සටහන: project එක sub-folder එකක chạy කරන විට BASE_URL හි folder name එක දාන්න.
 // උදාහරණය: XAMPP htdocs/art-gallery-premium නම් BASE_URL '/art-gallery-premium/' ලෙස තබන්න.
-define('BASE_URL', '/art-gallery-premium/');
+define('BASE_URL', '/');
 
 define('ADMIN_EMAIL', 'admin@artgallery.lk');
 define('CURRENCY', 'LKR');
