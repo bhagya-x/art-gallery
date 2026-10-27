@@ -19,14 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$stmt = $pdo->prepare("SELECT * FROM messages WHERE user_id = ? ORDER BY created_at DESC");
-$stmt->execute([current_user()['id']]);
-$messages = $stmt->fetchAll();
+$messages = [];
 $replies = [];
-if ($messages) {
-    $ids = implode(',', array_map('intval', array_column($messages, 'id')));
-    $replyRows = $pdo->query("SELECT message_replies.*, users.name AS admin_name FROM message_replies JOIN users ON message_replies.admin_id = users.id WHERE message_id IN ($ids) ORDER BY created_at ASC")->fetchAll();
-    foreach ($replyRows as $row) { $replies[$row['message_id']][] = $row; }
+
+if (db_connected()) {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM messages WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([current_user()['id']]);
+        $messages = $stmt->fetchAll();
+        if ($messages) {
+            $ids = implode(',', array_map('intval', array_column($messages, 'id')));
+            $replyRows = $pdo->query("SELECT message_replies.*, users.name AS admin_name FROM message_replies JOIN users ON message_replies.admin_id = users.id WHERE message_id IN ($ids) ORDER BY created_at ASC")->fetchAll();
+            foreach ($replyRows as $row) { $replies[$row['message_id']][] = $row; }
+        }
+    } catch (Throwable $e) {
+        $messages = [];
+        $replies = [];
+    }
 }
 $pageTitle = 'Messages';
 require_once __DIR__ . '/includes/header.php';

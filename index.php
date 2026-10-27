@@ -3,8 +3,62 @@ require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/config/database.php';
 
 $pageTitle = 'Home';
-$featured = $pdo->query("SELECT artworks.*, artists.name AS artist_name FROM artworks LEFT JOIN artists ON artworks.artist_id = artists.id WHERE featured = 1 ORDER BY artworks.created_at DESC LIMIT 3")->fetchAll();
-$artists = $pdo->query("SELECT * FROM artists ORDER BY id LIMIT 4")->fetchAll();
+$featured = [];
+$artists = [];
+
+if (db_connected()) {
+    try {
+        $featured = $pdo->query("SELECT artworks.*, artists.name AS artist_name FROM artworks LEFT JOIN artists ON artworks.artist_id = artists.id WHERE featured = 1 ORDER BY artworks.created_at DESC LIMIT 3")->fetchAll();
+        $artists = $pdo->query("SELECT * FROM artists ORDER BY id LIMIT 4")->fetchAll();
+    } catch (Throwable $e) {
+        $featured = [];
+        $artists = [];
+    }
+}
+
+if (empty($featured)) {
+    $featured = [
+        [
+            'id' => 1,
+            'title' => 'Whispers of Autumn',
+            'slug' => 'whispers-of-autumn',
+            'category' => 'Modern',
+            'price' => 45500.00,
+            'image' => 'assets/images/autumn.jpg',
+            'artist_name' => 'Lucas Brown',
+            'status' => 'Available',
+        ],
+        [
+            'id' => 2,
+            'title' => 'Floating Worlds',
+            'slug' => 'floating-worlds',
+            'category' => 'Abstract',
+            'price' => 62000.00,
+            'image' => 'assets/images/floating-worlds.jpg',
+            'artist_name' => 'Ethan Mitchell',
+            'status' => 'Available',
+        ],
+        [
+            'id' => 3,
+            'title' => 'Tranquil Oasis',
+            'slug' => 'tranquil-oasis',
+            'category' => 'Landscape',
+            'price' => 78000.00,
+            'image' => 'assets/images/tranquil-oasis.jpg',
+            'artist_name' => 'Ethan Mitchell',
+            'status' => 'Available',
+        ],
+    ];
+}
+
+if (empty($artists)) {
+    $artists = [
+        ['id' => 1, 'name' => 'Ethan Mitchell', 'location' => 'Venice, Italy', 'image' => 'assets/images/artist-ethan.jpg'],
+        ['id' => 2, 'name' => 'Lucas Brown', 'location' => 'Bangkok, Thailand', 'image' => 'assets/images/artist-lucas.jpg'],
+        ['id' => 3, 'name' => 'Oliver Taylor', 'location' => 'Cape Town, South Africa', 'image' => 'assets/images/artist-oliver.jpg'],
+        ['id' => 4, 'name' => 'Amara Silva', 'location' => 'Colombo, Sri Lanka', 'image' => 'assets/images/artist-amara.jpg'],
+    ];
+}
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="hero">

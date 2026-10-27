@@ -5,12 +5,22 @@ require_login();
 if (is_admin()) { redirect('admin/dashboard.php'); }
 
 $userId = current_user()['id'];
-$stmt = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
-$stmt->execute([$userId]);
-$orders = $stmt->fetchAll();
-$messageStmt = $pdo->prepare("SELECT * FROM messages WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
-$messageStmt->execute([$userId]);
-$messages = $messageStmt->fetchAll();
+$orders = [];
+$messages = [];
+
+if (db_connected()) {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$userId]);
+        $orders = $stmt->fetchAll();
+        $messageStmt = $pdo->prepare("SELECT * FROM messages WHERE user_id = ? ORDER BY created_at DESC LIMIT 5");
+        $messageStmt->execute([$userId]);
+        $messages = $messageStmt->fetchAll();
+    } catch (Throwable $e) {
+        $orders = [];
+        $messages = [];
+    }
+}
 $pageTitle = 'Customer Dashboard';
 require_once __DIR__ . '/includes/header.php';
 ?>

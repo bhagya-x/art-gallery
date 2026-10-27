@@ -2,7 +2,21 @@
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/config/database.php';
 $pageTitle = 'Exhibitions';
-$items = $pdo->query("SELECT * FROM exhibitions ORDER BY start_date DESC")->fetchAll();
+$items = [];
+if (db_connected()) {
+    try {
+        $items = $pdo->query("SELECT * FROM exhibitions ORDER BY start_date DESC")->fetchAll();
+    } catch (Throwable $e) {
+        $items = [];
+    }
+}
+
+if (empty($items)) {
+    $items = [
+        ['title' => 'New Forms in Modern Art', 'location' => 'Colombo Art Hall', 'start_date' => '2026-06-01', 'end_date' => '2026-06-10', 'image' => 'assets/images/exhibition-01.jpg', 'description' => 'A curated exhibition showcasing modern, traditional, and hand-drawn artworks.'],
+        ['title' => 'Collectors Private Viewing', 'location' => 'Galle Creative Studio', 'start_date' => '2026-07-05', 'end_date' => '2026-07-08', 'image' => 'assets/images/custom-work.jpg', 'description' => 'Private viewing event for collectors and gallery customers.'],
+    ];
+}
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="page-hero"><div class="container"><span class="eyebrow">Exhibitions</span><h1>Gallery Events</h1><p>Display exhibitions and public or private art viewing events.</p></div></section>

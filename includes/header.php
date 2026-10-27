@@ -80,6 +80,13 @@ function nav_attrs(string $file, string $currentPage): string
     </header>
 
     <main class="page-content">
+        <?php if (function_exists('db_connected') && !db_connected()): ?>
+            <div class="container" style="margin-top: 18px; margin-bottom: 12px;">
+                <div style="background: #fff8e6; border: 1px solid #ffd591; color: #873800; padding: 12px 18px; border-radius: 8px; font-size: 14px; line-height: 1.5; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                    <strong>Preview Mode:</strong> Cloud database credentials are not configured in Vercel yet. The site is currently displaying bundled sample gallery items. To connect your live MySQL database, add <code>DB_HOST</code>, <code>DB_NAME</code>, <code>DB_USER</code>, <code>DB_PASSWORD</code> in your <strong>Vercel Project Settings &rarr; Environment Variables</strong>.
+                </div>
+            </div>
+        <?php endif; ?>
         <?php if ($success = flash('success')): ?>
             <div class="container flash flash-success"><?= e($success) ?></div>
         <?php endif; ?>

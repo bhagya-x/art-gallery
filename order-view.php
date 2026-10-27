@@ -4,6 +4,10 @@ require_once __DIR__ . '/config/database.php';
 require_login();
 
 $id = (int)($_GET['id'] ?? 0);
+if (!db_connected()) {
+    $_SESSION['flash_error'] = 'Database is not connected.';
+    redirect('dashboard.php');
+}
 if (is_admin()) {
     $stmt = $pdo->prepare("SELECT orders.*, users.name, users.email FROM orders JOIN users ON orders.user_id = users.id WHERE orders.id = ? LIMIT 1");
     $stmt->execute([$id]);

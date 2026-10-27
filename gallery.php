@@ -7,20 +7,47 @@ $q = trim($_GET['q'] ?? '');
 $category = trim($_GET['category'] ?? '');
 $artist = trim($_GET['artist'] ?? '');
 
-$sql = "SELECT artworks.*, artists.name AS artist_name FROM artworks LEFT JOIN artists ON artworks.artist_id = artists.id WHERE 1=1";
-$params = [];
-if ($q !== '') {
-    $sql .= " AND (artworks.title LIKE ? OR artworks.description LIKE ? OR artworks.medium LIKE ?)";
-    $params[] = "%{$q}%"; $params[] = "%{$q}%"; $params[] = "%{$q}%";
-}
-if ($category !== '') { $sql .= " AND artworks.category = ?"; $params[] = $category; }
-if ($artist !== '') { $sql .= " AND artists.id = ?"; $params[] = $artist; }
-$sql .= " ORDER BY artworks.created_at DESC";
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$artworks = $stmt->fetchAll();
-$artists = $pdo->query("SELECT id, name FROM artists ORDER BY name")->fetchAll();
+$artworks = [];
+$artists = [];
 $categories = ['Modern', 'Traditional', 'Hand Drawn', 'Abstract', 'Landscape'];
+
+if (db_connected()) {
+    try {
+        $sql = "SELECT artworks.*, artists.name AS artist_name FROM artworks LEFT JOIN artists ON artworks.artist_id = artists.id WHERE 1=1";
+        $params = [];
+        if ($q !== '') {
+            $sql .= " AND (artworks.title LIKE ? OR artworks.description LIKE ? OR artworks.medium LIKE ?)";
+            $params[] = "%{$q}%"; $params[] = "%{$q}%"; $params[] = "%{$q}%";
+        }
+        if ($category !== '') { $sql .= " AND artworks.category = ?"; $params[] = $category; }
+        if ($artist !== '') { $sql .= " AND artists.id = ?"; $params[] = $artist; }
+        $sql .= " ORDER BY artworks.created_at DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $artworks = $stmt->fetchAll();
+        $artists = $pdo->query("SELECT id, name FROM artists ORDER BY name")->fetchAll();
+    } catch (Throwable $e) {
+        $artworks = [];
+        $artists = [];
+    }
+}
+
+if (empty($artworks) && !db_connected()) {
+    $artworks = [
+        ['id' => 1, 'title' => 'Whispers of Autumn', 'slug' => 'whispers-of-autumn', 'category' => 'Modern', 'price' => 45500.00, 'image' => 'assets/images/autumn.jpg', 'artist_name' => 'Lucas Brown', 'status' => 'Available'],
+        ['id' => 2, 'title' => 'Floating Worlds', 'slug' => 'floating-worlds', 'category' => 'Abstract', 'price' => 62000.00, 'image' => 'assets/images/floating-worlds.jpg', 'artist_name' => 'Ethan Mitchell', 'status' => 'Available'],
+        ['id' => 3, 'title' => 'Tranquil Oasis', 'slug' => 'tranquil-oasis', 'category' => 'Landscape', 'price' => 78000.00, 'image' => 'assets/images/tranquil-oasis.jpg', 'artist_name' => 'Ethan Mitchell', 'status' => 'Available'],
+        ['id' => 4, 'title' => 'Midnight Bloom', 'slug' => 'midnight-bloom', 'category' => 'Abstract', 'price' => 52500.00, 'image' => 'assets/images/midnight-bloom.jpg', 'artist_name' => 'Oliver Taylor', 'status' => 'Reserved'],
+        ['id' => 5, 'title' => 'Golden Memory', 'slug' => 'golden-memory', 'category' => 'Traditional', 'price' => 68500.00, 'image' => 'assets/images/golden-memory.jpg', 'artist_name' => 'Amara Silva', 'status' => 'Available'],
+        ['id' => 6, 'title' => 'Sea of Lines', 'slug' => 'sea-of-lines', 'category' => 'Hand Drawn', 'price' => 38000.00, 'image' => 'assets/images/sea-of-lines.jpg', 'artist_name' => 'Lucas Brown', 'status' => 'Available'],
+    ];
+    $artists = [
+        ['id' => 1, 'name' => 'Ethan Mitchell'],
+        ['id' => 2, 'name' => 'Lucas Brown'],
+        ['id' => 3, 'name' => 'Oliver Taylor'],
+        ['id' => 4, 'name' => 'Amara Silva'],
+    ];
+}
 require_once __DIR__ . '/includes/header.php';
 ?>
 <section class="page-hero">

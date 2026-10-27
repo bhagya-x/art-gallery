@@ -22,6 +22,9 @@ $old = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
     try {
+        if (!db_connected()) {
+            throw new RuntimeException('Database is not connected. Please configure database credentials in Vercel to place orders.');
+        }
         // සිංහල සටහන: මෙය demo card payment simulation එකක් පමණි; real payment gateway එකක් නොවේ.
         $old['delivery_address'] = trim($_POST['delivery_address'] ?? current_user()['address'] ?? '');
         $old['customer_note'] = trim($_POST['customer_note'] ?? '');

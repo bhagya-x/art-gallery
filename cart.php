@@ -13,9 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($action === 'add') {
     $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
     $qty = max(1, min(5, (int)($_POST['qty'] ?? 1)));
-    $stmt = $pdo->prepare("SELECT id, title, price, image, slug, status FROM artworks WHERE id = ? LIMIT 1");
-    $stmt->execute([$id]);
-    $art = $stmt->fetch();
+    $art = null;
+    if (db_connected()) {
+        try {
+            $stmt = $pdo->prepare("SELECT id, title, price, image, slug, status FROM artworks WHERE id = ? LIMIT 1");
+            $stmt->execute([$id]);
+            $art = $stmt->fetch();
+        } catch (Throwable $e) {
+            $art = null;
+        }
+    } else {
+        $sampleArtworks = [
+            1 => ['id' => 1, 'title' => 'Whispers of Autumn', 'price' => 45500.00, 'image' => 'assets/images/autumn.jpg', 'slug' => 'whispers-of-autumn', 'status' => 'Available'],
+            2 => ['id' => 2, 'title' => 'Floating Worlds', 'price' => 62000.00, 'image' => 'assets/images/floating-worlds.jpg', 'slug' => 'floating-worlds', 'status' => 'Available'],
+            3 => ['id' => 3, 'title' => 'Tranquil Oasis', 'price' => 78000.00, 'image' => 'assets/images/tranquil-oasis.jpg', 'slug' => 'tranquil-oasis', 'status' => 'Available'],
+        ];
+        $art = $sampleArtworks[$id] ?? null;
+    }
     if ($art && $art['status'] === 'Available') {
         $_SESSION['cart'][$id] = [
             'id' => $art['id'],

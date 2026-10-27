@@ -37,6 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['message'] = 'Message is required.';
     }
 
+    if (!db_connected()) {
+        $errors['general'] = 'Database is not connected. Please set up database environment variables in Vercel to submit inquiries.';
+    }
+
     if ($errors) {
         $_SESSION['flash_error'] = 'Please correct the highlighted fields.';
     } else {

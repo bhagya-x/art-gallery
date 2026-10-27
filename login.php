@@ -21,6 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['password'] = 'Password is required.';
     }
 
+    if (!db_connected()) {
+        $errors['general'] = 'Database is not connected. Please set up database environment variables in Vercel to sign in.';
+    }
+
     if (!$errors) {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);

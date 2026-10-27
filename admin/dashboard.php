@@ -6,13 +6,28 @@ require_admin();
 $pageTitle = 'Admin Dashboard';
 
 $counts = [
-    'artworks' => $pdo->query("SELECT COUNT(*) FROM artworks")->fetchColumn(),
-    'customers' => $pdo->query("SELECT COUNT(*) FROM users WHERE role='customer'")->fetchColumn(),
-    'orders' => $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn(),
-    'messages' => $pdo->query("SELECT COUNT(*) FROM messages WHERE status='Open'")->fetchColumn(),
+    'artworks' => 0,
+    'customers' => 0,
+    'orders' => 0,
+    'messages' => 0,
 ];
-$sales = $pdo->query("SELECT COALESCE(SUM(total),0) FROM orders WHERE status IN ('Processing','Reserved','Completed')")->fetchColumn();
-$recentOrders = $pdo->query("SELECT orders.*, users.name FROM orders JOIN users ON orders.user_id = users.id ORDER BY orders.created_at DESC LIMIT 6")->fetchAll();
+$sales = 0;
+$recentOrders = [];
+
+if (db_connected()) {
+    try {
+        $counts = [
+            'artworks' => $pdo->query("SELECT COUNT(*) FROM artworks")->fetchColumn(),
+            'customers' => $pdo->query("SELECT COUNT(*) FROM users WHERE role='customer'")->fetchColumn(),
+            'orders' => $pdo->query("SELECT COUNT(*) FROM orders")->fetchColumn(),
+            'messages' => $pdo->query("SELECT COUNT(*) FROM messages WHERE status='Open'")->fetchColumn(),
+        ];
+        $sales = $pdo->query("SELECT COALESCE(SUM(total),0) FROM orders WHERE status IN ('Processing','Reserved','Completed')")->fetchColumn();
+        $recentOrders = $pdo->query("SELECT orders.*, users.name FROM orders JOIN users ON orders.user_id = users.id ORDER BY orders.created_at DESC LIMIT 6")->fetchAll();
+    } catch (Throwable $e) {
+        // fallback
+    }
+}
 require_once __DIR__ . '/../includes/header.php';
 ?>
 <section class="page-hero"><div class="container"><span class="eyebrow">Admin</span><h1>Dashboard</h1><p>Manage artworks, artists, orders, customers, reports, and messages.</p></div></section>

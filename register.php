@@ -40,6 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['password'] = 'Password must be at least 6 characters.';
     }
 
+    if (!db_connected()) {
+        $errors['email'] = 'Database is not connected. Please set up database environment variables in Vercel to register.';
+    }
+
     if (!$errors) {
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
         $stmt->execute([$old['email']]);
