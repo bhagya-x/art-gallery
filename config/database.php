@@ -51,7 +51,7 @@ if (!empty($host) && !empty($dbname)) {
 
         // Cloud MySQL SSL support (e.g. Aiven, TiDB, PlanetScale)
         if (getenv('DB_SSL') === 'true' || getenv('DB_SSL') === '1' || str_contains($host, 'aivencloud') || str_contains($host, 'tidbcloud')) {
-            $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+            $options[Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT] = false;
         }
 
         $pdo = new PDO($dsn, $username, $password, $options);
